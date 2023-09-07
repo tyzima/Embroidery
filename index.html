@@ -47,7 +47,7 @@
         widthValue.textContent = e.target.value;
     });
 
-  if (svgUrl) {
+if (svgUrl) {
     fetch(svgUrl)
         .then(response => response.text())
         .then(data => {
@@ -64,7 +64,11 @@ function calculateStitchCount() {
     const ctx = canvas.getContext('2d');
     const img = new Image();
     const widthInInches = parseFloat(widthSlider.value);
-    img.src = 'data:image/svg+xml;base64,' + btoa(svgDisplay.outerHTML);
+
+    // Convert SVG to Data URI
+    const svgDataURI = 'data:image/svg+xml;base64,' + btoa(unescape(encodeURIComponent(svgDisplay.outerHTML)));
+    img.src = svgDataURI;
+
     img.onload = function () {
         const scale = widthInInches / img.width;
         canvas.width = img.width * scale;
@@ -87,6 +91,7 @@ function calculateStitchCount() {
         console.error("Failed to load SVG as image.");
     };
 }
+
 
 </script>
 
