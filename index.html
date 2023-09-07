@@ -1,33 +1,84 @@
 <!DOCTYPE html>
 <html lang="en">
-
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>SVG Stitch Count Estimator</title>
+    <title>SVG Stitch Counter</title>
     <style>
-        /* CSS goes here */
+        body {
+            font-family: Arial, sans-serif;
+            margin: 20px;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+        }
+        .card {
+            border: 1px solid #e0e0e0;
+            padding: 20px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.1);
+            display: flex;
+            align-items: center;
+            justify-content: space-between;
+            width: 90%;
+            max-width: 600px;
+        }
     </style>
 </head>
-
 <body>
-    <div class="container">
-        <h1>SVG Stitch Count Estimator</h1>
-        <form id="upload-form">
-            <div class="input-group">
-                <label for="svg-upload">Upload SVG File:</label>
-                <input type="file" id="svg-upload" accept=".svg">
-            </div>
-            <div class="input-group">
-                <label for="width-dimension">Width Dimension:</label>
-                <input type="number" id="width-dimension" placeholder="Enter width in pixels">
-            </div>
-            <button type="submit">Estimate Stitch Count</button>
-        </form>
-        <div class="result">
-            Estimated Stitch Count: <span id="stitch-count">-</span>
-        </div>
-    </div>
-</body>
 
+<input type="range" id="widthSlider" min="1" max="7" step="0.1" value="1">
+<label for="widthSlider">Width (in inches): <span id="widthValue">1</span></label>
+<br>
+<button onclick="calculateStitchCount()">Stitch Count</button>
+
+<div class="card">
+    <svg id="svgDisplay" width="300" height="300"></svg>
+    <div>Stitches: <span id="stitchCount">0</span></div>
+</div>
+
+<script>
+    const urlParams = new URLSearchParams(window.location.search);
+    const svgUrl = urlParams.get('svg');
+    const svgDisplay = document.getElementById('svgDisplay');
+    const widthValue = document.getElementById('widthValue');
+    const widthSlider = document.getElementById('widthSlider');
+
+    widthSlider.addEventListener('input', (e) => {
+        widthValue.textContent = e.target.value;
+    });
+
+    if (svgUrl) {
+        fetch(svgUrl)
+            .then(response => response.text())
+            .then(data => {
+                svgDisplay.innerHTML = data;
+            });
+    }
+
+    function calculateStitchCount() {
+        const canvas = document.createElement('canvas');
+        const ctx = canvas.getContext('2d');
+        const img = new Image();
+        const widthInInches = parseFloat(widthSlider.value);
+        img.src = 'data:image/svg+xml;base64,' + btoa(svgDisplay.outerHTML);
+        img.onload = function () {
+            const scale = widthInInches / img.width;
+            canvas.width = img.width * scale;
+            canvas.height = img.height * scale;
+            ctx.drawImage(img, 0, 0, canvas.width, canvas.height);
+            const imageData = ctx.getImageData(0, 0, canvas.width, canvas.height).data;
+            let filledPixelCount = 0;
+            for (let i = 0; i < imageData.length; i += 4) {
+                if (imageData[i + 3] !== 0) {
+                    filledPixelCount++;
+                }
+            }
+            const stitchesPerQuarterInch = 125;
+            const stitches = Math.round(filledPixelCount / (0.25 * 0.25) * stitchesPerQuarterInch);
+            document.getElementById('stitchCount').textContent = stitches;
+        };
+    }
+</script>
+
+</body>
 </html>
