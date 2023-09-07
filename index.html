@@ -1,0 +1,33 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>SVG Stitch Count Estimator</title>
+    <style>
+        /* CSS goes here */
+    </style>
+</head>
+
+<body>
+    <div class="container">
+        <h1>SVG Stitch Count Estimator</h1>
+        <form id="upload-form">
+            <div class="input-group">
+                <label for="svg-upload">Upload SVG File:</label>
+                <input type="file" id="svg-upload" accept=".svg">
+            </div>
+            <div class="input-group">
+                <label for="width-dimension">Width Dimension:</label>
+                <input type="number" id="width-dimension" placeholder="Enter width in pixels">
+            </div>
+            <button type="submit">Estimate Stitch Count</button>
+        </form>
+        <div class="result">
+            Estimated Stitch Count: <span id="stitch-count">-</span>
+        </div>
+    </div>
+</body>
+
+</html>
